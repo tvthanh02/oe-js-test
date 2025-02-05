@@ -1,65 +1,43 @@
-import { useEffect, useState } from "react";
-import FilterOptionItem from "./filter-option-item";
+import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router";
+import FilterCheckboxItem from "./filter-checkbox-item";
+
+const TOPPINGS = [
+  { id: 1, title: "Milk Foam" },
+  { id: 2, title: "White Pearl" },
+  { id: 3, title: "Pearl" },
+  { id: 4, title: "Aloe" },
+];
 
 const FilterOptionList = ({ isEpand }: { isEpand: boolean }) => {
   const { search } = useLocation();
   const navigate = useNavigate();
 
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-
-  useEffect(() => {
+  const selectedFilters = useMemo(() => {
     const searchParams = new URLSearchParams(search);
-    const filters = searchParams.getAll("filter");
-
-    if (filters.length > 0) {
-      setSelectedFilters(filters);
-    } else {
-      setSelectedFilters([]);
-    }
+    return searchParams.getAll("filter");
   }, [search]);
 
   const handleCheckedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
+    const searchParams = new URLSearchParams(search);
 
-    setSelectedFilters((prevSelectedFilters) => {
-      const newFilters = checked
-        ? [...prevSelectedFilters, value]
-        : prevSelectedFilters.filter((filter) => filter !== value);
-
-      const searchParams = new URLSearchParams(search);
+    if (checked) {
+      searchParams.append("filter", value);
+    } else {
+      // Lọc ra những filter khác ngoài filter hiện tại
+      const updatedFilters = selectedFilters.filter(
+        (filter) => filter !== value
+      );
       searchParams.delete("filter");
-      newFilters.forEach((filter) => {
-        searchParams.append("filter", filter);
-      });
+      updatedFilters.forEach((filter) => searchParams.append("filter", filter));
+    }
 
-      navigate({
-        pathname: location.pathname,
-        search: searchParams.toString(),
-      });
-
-      return newFilters;
+    navigate({
+      pathname: location.pathname,
+      search: searchParams.toString(),
     });
   };
-
-  const toppings: { id: number; title: string }[] = [
-    {
-      id: 1,
-      title: "Milk Foam",
-    },
-    {
-      id: 2,
-      title: "White Pearl",
-    },
-    {
-      id: 3,
-      title: "Pearl",
-    },
-    {
-      id: 4,
-      title: "Aloe",
-    },
-  ];
 
   if (!isEpand) return null;
 
@@ -67,9 +45,9 @@ const FilterOptionList = ({ isEpand }: { isEpand: boolean }) => {
     <section className="w-full p-3 bg-white flex flex-col gap-5">
       <p className="text-lg text-blue-900 font-semibold">Toppings:</p>
       <ul className="w-full list-none flex gap-7 flex-wrap">
-        {toppings.map((topping) => (
+        {TOPPINGS.map((topping) => (
           <li key={topping.id}>
-            <FilterOptionItem
+            <FilterCheckboxItem
               id={topping.id}
               title={topping.title}
               handleCheck={handleCheckedChange}

@@ -1,25 +1,32 @@
-import { useMemo } from "react";
 import useFetchProductsOfStore from "../data/useFetchProductsOfStore";
-import { useLocation } from "react-router";
 import ProductCard from "./product-card";
 
-const ListProduct = () => {
-  const { pathname } = useLocation();
+const ListProduct = ({ storeId }: { storeId: number }) => {
+  const { data, isLoading, error } = useFetchProductsOfStore(storeId);
 
-  const storeId = useMemo(() => {
-    const valueIndex2 = Number(pathname.split("/")[2]);
-    if (isNaN(valueIndex2)) throw new Error("storeId must the number");
-    return valueIndex2;
-  }, [pathname]);
+  if (error) {
+    return (
+      <div className="w-full h-[200px] flex items-center justify-center text-lg text-red-600">
+        Error loading products.
+      </div>
+    );
+  }
 
-  const data = useFetchProductsOfStore(storeId);
+  if (isLoading) {
+    return (
+      <div className="w-full h-[200px] flex items-center justify-center text-lg text-gray-500">
+        Loading...
+      </div>
+    );
+  }
 
-  if (data?.data.length === 0)
+  if (!data?.data?.length) {
     return (
       <div className="w-full h-[200px] flex items-center justify-center text-lg text-blue-900 font-semibold">
         No Products Available
       </div>
     );
+  }
 
   return (
     <div className="w-full flex items-center gap-5 flex-wrap">

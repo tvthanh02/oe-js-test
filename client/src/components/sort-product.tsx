@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef } from "react";
-import { useNavigate, useSearchParams, useLocation } from "react-router";
+import { useEffect, useRef, useCallback } from "react";
+import { useNavigate, useLocation } from "react-router";
 
 const SortProduct = () => {
   const navigate = useNavigate();
@@ -7,37 +7,29 @@ const SortProduct = () => {
 
   const selectEleRef = useRef<HTMLSelectElement>(null);
 
-  useEffect(() => {
-    const defaultSelectedValue = selectEleRef.current?.value;
-    const [sortBy, sortOrder] = defaultSelectedValue?.split(",") ?? [];
-    const queryParams = new URLSearchParams(search);
-    // queryParams.set("sort", sortBy);
-    // queryParams.set("order", sortOrder);
-    queryParams.delete("sort");
-    queryParams.delete("order");
-    queryParams.append("sort", sortBy);
-    queryParams.append("order", sortOrder);
+  const updateQueryParams = useCallback(
+    (sortBy: string, sortOrder: string) => {
+      const queryParams = new URLSearchParams(search);
+      queryParams.set("sort", sortBy);
+      queryParams.set("order", sortOrder);
 
-    navigate({
-      pathname: window.location.pathname,
-      search: queryParams.toString(),
-    });
-  }, [navigate, search]);
+      navigate({
+        pathname: window.location.pathname,
+        search: queryParams.toString(),
+      });
+    },
+    [navigate, search]
+  );
+
+  useEffect(() => {
+    const defaultSelectedValue = selectEleRef.current?.value ?? "price,asc";
+    const [sortBy, sortOrder] = defaultSelectedValue.split(",");
+    updateQueryParams(sortBy, sortOrder);
+  }, [updateQueryParams]);
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const [sortBy, sortOrder] = e.target.value.split(",");
-    const queryParams = new URLSearchParams(search);
-    // queryParams.set("sort", sortBy);
-    // queryParams.set("order", sortOrder);
-    queryParams.delete("sort");
-    queryParams.delete("order");
-    queryParams.append("sort", sortBy);
-    queryParams.append("order", sortOrder);
-
-    navigate({
-      pathname: window.location.pathname,
-      search: queryParams.toString(),
-    });
+    updateQueryParams(sortBy, sortOrder);
   };
 
   return (
@@ -47,33 +39,18 @@ const SortProduct = () => {
         ref={selectEleRef}
         onChange={handleSortChange}
         defaultValue="price,asc"
-        title="Price( a - Z )"
-        className="text-blue-950 font-semibold hover:cursor-pointer w-fit px-10 py-2 border border-blue-900 outline-none bg-gray-200 rounded-md overflow-hidden"
+        className="text-blue-950 font-semibold hover:cursor-pointer w-fit px-10 py-2 border border-blue-900 outline-none bg-gray-200 rounded-md"
       >
-        <option
-          className="text-blue-950 font-semibold hover:cursor-pointer"
-          value="name,desc"
-        >
-          Name ( Z - a )
-        </option>
-        <option
-          className="text-blue-950 font-semibold hover:cursor-pointer"
-          value="name,asc"
-        >
-          Name ( a - Z )
-        </option>
-        <option
-          className="text-blue-950 font-semibold hover:cursor-pointer"
-          value="price,asc"
-        >
-          Price ( a - Z )
-        </option>
-        <option
-          className="text-blue-950 font-semibold hover:cursor-pointer"
-          value="price,desc"
-        >
-          Price ( z - A )
-        </option>
+        {[
+          { value: "name,desc", label: "Name ( Z - A )" },
+          { value: "name,asc", label: "Name ( A - Z )" },
+          { value: "price,asc", label: "Price ( Low - High )" },
+          { value: "price,desc", label: "Price ( High - Low )" },
+        ].map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
       </select>
     </div>
   );

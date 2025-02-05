@@ -1,9 +1,9 @@
-const FilterOptionItem = ({
+const FilterCheckboxItem = ({
   id,
   title,
   handleCheck,
   checked,
-}: FilterOptionItemProps) => {
+}: FilterCheckboxItemProps) => {
   return (
     <div className="flex items-center gap-3">
       <input
@@ -21,4 +21,4 @@ const FilterOptionItem = ({
   );
 };
 
-export default FilterOptionItem;
+export default FilterCheckboxItem;

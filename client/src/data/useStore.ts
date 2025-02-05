@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const useStore = (storeId: number) => {
+const useStore = (storeId: number | null) => {
   const [store, setStore] = useState<Store>();
 
   useEffect(() => {
@@ -27,6 +27,8 @@ const useStore = (storeId: number) => {
       }
     })();
   }, [storeId]);
+
+  if (!storeId) return;
 
   return store;
 };
