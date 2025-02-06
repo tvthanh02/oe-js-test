@@ -1,4 +1,6 @@
 Internship Inquiry
+
+
 1.Bạn có nguyện vọng được thực tập sâu về: Frontend, Backend, AI Engineer?
 Trả lời:
 Em có nguyện vọng thực tập sâu về Frontend để nâng cao kỹ năng phát triển giao diện người dùng. Tuy nhiên, em cũng muốn thử sức và tiếp cận thêm với Backend để có cái nhìn toàn diện hơn về quy trình phát triển ứng dụng.
